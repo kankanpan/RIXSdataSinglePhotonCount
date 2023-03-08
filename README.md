@@ -1,6 +1,8 @@
-# RIXSdataSinglePhotonCount
+# RIXSdataSinglePhotonCount　(under development)
 
 Single photon counting from CCD camera data acquired by RIXS measurement.
+
+Only .h5py file format is supported yet.
 
 ## install and run
 
