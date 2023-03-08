@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SINGLE PHOTON COUNT ANALYSER</title>
+
+    <!-- Include eel.js - note this file doesn't exist in the 'web' directory -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.1.2/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.2.0/dist/Chart.min.css" rel="stylesheet"></link>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@next"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue3-sfc-loader"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.1.2/dist/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.0/dist/chart.umd.min.js"></script>
+    <script>
+        const options = {
+            moduleCache: {
+                vue: Vue,
+                vuetify: Vuetify
+            },
+            async getFile(url) {
+                const res = await fetch(url)
+                if (!res.ok)
+                    throw Object.assign(new Error(res.statusText + ' ' + url), { res })
+                return {
+                    getContentData: asBinary => asBinary ? res.arrayBuffer() : res.text(),
+                }
+            },
+            addStyle(textContent) {
+                const style = Object.assign(document.createElement('style'), { textContent })
+                const ref = document.head.getElementsByTagName('style')[0] || null
+                document.head.insertBefore(style, ref)
+            },
+        }
+        const { loadModule } = window["vue3-sfc-loader"]
+
+        const vuetify = Vuetify.createVuetify()
+        const app = Vue.createApp({
+            components: {
+                "app": Vue.defineAsyncComponent(() =>
+                    loadModule("./app.vue", options)
+                ),
+            },
+            template: `<app></app>`,
+        }).use(vuetify).mount('#app')
+    </script>
+</body>
+
+</html>
