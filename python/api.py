@@ -175,10 +175,9 @@ def startTkDialog():
     root.lift()
     root.focus_force()
 
-    folder_path = "/Users/tatsu/Desktop/gigafile-0209-3c70f61a66b61b52ff7de847266ebf51"
-    # current_dir = current_dir = os.path.abspath(os.path.dirname(__file__))
-    # folder_path = tkinter.filedialog.askdirectory(
-    #     title="Open Folder", initialdir=current_dir)
+    current_dir = current_dir = os.path.abspath(os.path.dirname(__file__))
+    folder_path = tkinter.filedialog.askdirectory(
+        title="Open Folder", initialdir=current_dir)
     root.update()
     root.destroy()
 
