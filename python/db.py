@@ -88,7 +88,8 @@ class RixsDB:
                 })
     
     def getFilePaths(self) -> list[str]:
-        return self.file_index.all()
+        fi= self.file_index.all()
+        return sorted(fi, key=lambda x: x['path'])
     
     def getFullPath(self, id: str) -> str:
         queries = Query()
