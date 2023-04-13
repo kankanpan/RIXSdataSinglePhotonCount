@@ -75,6 +75,14 @@ const clipImage = async () => {
     return {'data': ip['dist'], 'max': ip['max'] + 0}
 }
 
+const clipImageProfiles = async () => {
+    let dist = await eel.clipImageProfiles(
+        file_id.value,
+        [tool_model.value.clip_range_h, tool_model.value.clip_range_w]
+    )()
+    return dist
+}
+
 const photonCount = async () => {
     // {"raw_img": clip_dset, "result_img": result_img, "size": np.shape(clip_dset), "results": single_count_list, "max": dset_max}
     // let ip = await eel.photonCount(
@@ -126,6 +134,10 @@ const saveIgor = async (title, data) => {
     await eel.saveIgor(title, data)()
 }
 
+const saveImages = async () => {
+    await eel.saveImages(current_index.value)()
+}
+
 const api = {
     'test': test,
     'openFolder': openFolder,
@@ -136,7 +148,9 @@ const api = {
     'clipImage': clipImage,
     'photonCount': photonCount,
     'saveCSV': saveCSV,
-    'saveIgor': saveIgor
+    'saveIgor': saveIgor,
+    'clipImageProfiles': clipImageProfiles,
+    'saveImages': saveImages
 }
 Vue.provide('api', api)
 

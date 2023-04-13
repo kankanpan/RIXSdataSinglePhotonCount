@@ -45,11 +45,39 @@ function countX(data_array, width, include_int = false) {
 }
 
 function saveCSV() {
-    api.saveCSV(['index', 'layer number', 'x', 'y', 'intensity'], result_data.value)
+    // api.saveCSV(['index', 'layer number', 'x', 'y', 'intensity'], result_data.value)
+
+    const filename = "results.csv"
+    const title = 'index,layer number,x,y,intensity'
+    const len = result_data.value[0].length
+    let data = title
+    for (let j = 0; j < result_data.value.length; j++) {
+        data += '\n'
+        for (let i = 0; i < 5; i++) {
+            data += result_data.value[j][i] + ','
+        }
+    }
+    const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
+    const blob = new Blob([bom, data], { type: "text/csv" })
+
+    const url = (window.URL || window.webkitURL).createObjectURL(blob);
+    const download = document.createElement("a");
+    //リンク先に上記で生成したURLを指定する
+    download.href = url;
+    //download属性にファイル名を指定する
+    download.download = filename;
+    //作成したリンクをクリックしてダウンロードを実行する
+    download.click();
+    //createObjectURLで作成したオブジェクトURLを開放する
+    (window.URL || window.webkitURL).revokeObjectURL(url);
 }
 
 function saveIgor() {
     api.saveIgor(['index', 'layer number', 'x', 'y', 'intensity'], result_data.value)
+}
+
+function saveImages() {
+    api.saveImages()
 }
 
 </script>
@@ -58,6 +86,7 @@ function saveIgor() {
     <v-btn @click="photonCount">retray</v-btn>
     <v-btn @click="saveCSV">save as CSV</v-btn>
     <v-btn @click="saveIgor">save as Igor text</v-btn>
+    <v-btn @click="saveImages">save as Images</v-btn>
     <v-table fixed-header height="300px">
         <thead>
             <tr>

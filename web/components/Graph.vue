@@ -1,7 +1,16 @@
 <script setup>
 let canvasRef = Vue.ref(null)
-let chart = Vue.ref(null)
 let axis_range = Vue.ref([0, 0])
+
+let chart_scales = Vue.ref({
+    x: {
+        display: true
+    },
+    y: {
+        display: true,
+        type: props.logscale ? 'logarithmic' : 'linear',
+    }
+})
 
 const props = defineProps({
     data: Object,
@@ -13,7 +22,7 @@ Vue.onMounted(() => {
     if (canvasRef.value === null) return
     const canvas = canvasRef.value.getContext('2d')
     if (canvas === null) return
-    chart.value = new Chart(canvas, {
+    const chart_instance = new Chart(canvas, {
         type: props.type,
         data: {
             datasets: [{
@@ -26,39 +35,44 @@ Vue.onMounted(() => {
                     display: false
                 }
             },
-            scales: {
-                x: {
-                    display: true,
-                },
-                y: {
-                    display: true,
-                    type: props.logscale ? 'logarithmic' : 'linear',
-                }
-            }
+            scales: chart_scales.value
         }
     })
-    console.log("chart.value.scales.y", chart.value.scales)
-    axis_range.value = [chart.value.scales.y.min, chart.value.scales.y.max]
+    console.log("chart.value.scales.y", chart_instance.scales)
+    axis_range.value = [chart_instance.scales.y.min, chart_instance.scales.y.max]
 })
 
-function changeRange(value) {
-    console.log(parseInt(value, 10))
-    console.log(axis_range.value[1])
-    console.log(chart.value.options.scales.y)
-    chart.value.options.scales.y = {
-        ...chart.value.options.scales.y,
-        max: parseInt(value, 10)
+function changeRange(value, index) {
+    if (!value) return
+    
+    const chart_instance = Chart.getChart("canvas-id")
+    axis_range.value[index] = parseInt(value, 10)
+    if (index == 0) {
+        chart_scales.value.y.min = parseInt(value, 10)
+    } else if (index == 1) {
+        chart_scales.value.y.max = parseInt(value, 10)
     }
-    // chart.value.scales.linear.min = axis_range.value[0]
-    const result = chart.value.update()
-    console.log(result)
+    chart_instance.options.scales = chart_scales.value
+    chart_instance.update()
+
     return value
+}
+
+defineExpose({
+    dataUpdate,
+})
+
+function dataUpdate() {
+    const chart_instance = Chart.getChart("canvas-id")
+    console.log("props.data", props.data)
+    chart_instance.data.datasets[0].data = props.data
+    chart_instance.update()
 }
 
 </script>
 
 <template>
-<canvas ref="canvasRef" />
-<!-- <v-text-field @update:modelValue="changeRange" v-model="axis_range[0]" label="min"></v-text-field>
-<v-text-field @update:modelValue="changeRange" v-model="axis_range[1]" label="max"></v-text-field> -->
+<canvas id="canvas-id" ref="canvasRef" />
+<v-text-field @update:modelValue="v => changeRange(v, 0)" v-model="axis_range[0]" label="min"></v-text-field>
+<v-text-field @update:modelValue="v => changeRange(v, 1)" v-model="axis_range[1]" label="max"></v-text-field>
 </template>

@@ -5,8 +5,13 @@ from PIL import Image
 import base64
 import os
 import glob
-import json
 from json import JSONEncoder
+
+
+def saveImageToH5pyFile(file_name):
+    dset, _, _ = convartH5pyFile(file_name)
+    im = Image.fromarray(dset)
+    im.save("test.png")
 
 def convartH5pyFile(file_name):
     f = h5py.File(file_name, 'r')

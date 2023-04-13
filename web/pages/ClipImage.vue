@@ -1,11 +1,22 @@
 <script setup>
+let api = Vue.inject('api')
+
 const Chart = Vue.defineAsyncComponent(() =>
     loadModule("../components/graph.vue", options)
 )
 
+const chartRef = Vue.ref()
+const images = Vue.ref()
+const dest = Vue.ref({})
 
-const images = Vue.inject('images')
+const base_images = Vue.inject('images')
 const current_index = Vue.inject('current_index')
+
+Vue.watch(current_index, (newValue, oldValue) => {
+    if (!chartRef.value) return
+    profileData()
+    chartRef.value.dataUpdate()
+})
 
 const emit = defineEmits(
     ['loadDone']
@@ -17,6 +28,8 @@ function setInitLimit(img_size) {
 
 Vue.onMounted(async () => {
     emit('loadDone')
+    images.value = base_images.value
+    profileData()
 })
 
 async function autoFindRange() {
@@ -26,32 +39,43 @@ async function autoFindRange() {
     }
 }
 
+async function clipImagesProfile() {
+    if (!chartRef.value) return
+    const dists = await api.clipImageProfiles()
+    images.value = images.value.map((img, index) => {
+        img[2] = dists[index]
+        return img
+    })
+    console.log(images)
+    profileData()
+    chartRef.value.dataUpdate()
+}
+
 function profileData() {
     let result = {}
     for (let i = 1; i <= 255; i++) {
         result[String(i)] = 0
     }
-    console.log(images.value.filter(i => current_index.value.includes(i[1])))
     for (const image of images.value.filter(i => current_index.value.includes(i[1]))) {
-        image[2]
         for (let i = 1; i <= 255; i++) {
-            result[String(i)] += image[2][String(i)]
+            result[String(i)] += isNaN(image[2][i]) ? 0 : image[2][i]
         }
     }
     console.log("result", result)
-    return result
+    dest.value = result
 }
 
 </script>
 
 <template>
+    <v-btn @click="clipImagesProfile">プロファイル更新</v-btn>
     <v-expansion-panels>
     <v-expansion-panel>
         <v-expansion-panel-title>
             Data profile
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-            <Chart type="line" :data="profileData()" :logscale="true"></Chart>
+            <Chart ref="chartRef" type="line" :data="dest" :logscale="false"></Chart>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
