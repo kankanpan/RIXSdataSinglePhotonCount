@@ -15,7 +15,7 @@ numpy==1.24.1
 opencv-python==4.7.0.68
 Pillow==9.4.0
 polars==0.16.4
-pyinstaller==5.7.0
+pyinstaller==5.13.1
 pyinstaller-hooks-contrib==2022.15
 pyparsing==3.0.9
 python-dateutil==2.8.2
